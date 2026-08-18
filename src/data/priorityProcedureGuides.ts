@@ -5,6 +5,8 @@ const d=(catalogId:string,id=catalogId,overrides:Partial<RequiredDocument>={})=>
 const x=(id:string,name:string,description:string,sourceUrl:string,overrides:Partial<RequiredDocument>={})=>completeDocument({id,name,description,sourceUrl,...overrides});
 const s=(sourceUrl:string,items:Array<[string,string,string,string?,string?,ProcedureStep['condition']?]>):ProcedureStep[]=>items.map(([id,title,description,method,caution,condition],index)=>({id,order:index+1,title,description,method,caution,condition,sourceUrl}));
 const HIKOREA='https://www.hikorea.go.kr/';
+const HIKOREA_FORMS='https://www.hikorea.go.kr/board/BoardApplicationListR.pt?page=1#this';
+const HIKOREA_APPLY='https://www.hikorea.go.kr/cvlappl/CvlapplStep1.pt#this';
 const GOV_MOVE='https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000016&HighCtgCD=A01010&tp_seq=01';
 const RTMS='https://rtms.molit.go.kr/main/systemInfo.do';
 const KOSAF='https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_12_05';
@@ -13,8 +15,8 @@ const condition=(questionId:string,...values:string[])=>({questionId,values});
 
 const d2ResidenceDocuments:RequiredDocument[]=[
   d('lease_contract','d2-own-lease',{applicableWhen:'본인 명의 자취방에 거주하는 경우',condition:condition('residence-type','own-rental'),preparationGuide:'정확한 주소, 임대기간, 임대인·임차인 정보와 양쪽 서명 또는 날인이 모두 보이도록 전체 계약서를 스캔하세요.'}),
-  x('dorm-proof','기숙사 거주확인서','학교 기숙사 주소와 실제 거주기간을 확인하는 학교 발급 서류입니다.',HIKOREA,{documentType:'institution_issued',issuer:'기숙사 행정실·소속 대학',actionLabel:'학교 발급처 확인',actionUrl:'https://www.academyinfo.go.kr/',alternativeMethod:'기숙사 행정실 또는 학교 포털에서 발급받으세요.',preparationGuide:'기숙사 주소와 거주기간이 표시되어 있는지 확인하세요.',condition:condition('residence-type','dorm')}),
-  x('accommodation-confirmation','거주·숙소제공 확인서','타인 또는 숙박업체가 제공하는 주소에 거주한다는 사실을 숙소 제공자가 작성·서명하는 공식 서식입니다.',HIKOREA,{documentType:'official_template',issuer:'법무부·숙소 제공자',actionLabel:'Hi Korea에서 양식 찾기',actionUrl:HIKOREA,alternativeMethod:'Hi Korea → 뉴스·공지 → 민원서식에서 “거주/숙소제공 확인서”를 검색하세요.',preparationGuide:'최신 양식을 내려받아 숙소 제공자가 주소·제공기간을 작성하고 서명합니다.',condition:condition('residence-type','other-person','lodging')}),
+  x('dorm-proof','기숙사 거주확인서','학교 기숙사 주소와 실제 거주기간을 확인하는 학교 발급 서류입니다.',HIKOREA,{documentType:'institution_issued',issuer:'기숙사 행정실·소속 대학',actionLabel:'학교 발급처 확인',actionUrl:undefined,alternativeMethod:'',preparationGuide:'기숙사 행정실 또는 학교 포털에서 발급받고, 기숙사 주소와 거주기간이 표시됐는지 확인하세요.',condition:condition('residence-type','dorm')}),
+  x('accommodation-confirmation','거주·숙소제공 확인서','타인 또는 숙박업체가 제공하는 주소에 거주한다는 사실을 숙소 제공자가 작성·서명하는 공식 서식입니다.',HIKOREA,{documentType:'official_template',issuer:'법무부·숙소 제공자',actionLabel:'숙소제공확인서 찾기',actionUrl:HIKOREA_FORMS,alternativeMethod:'',preparationGuide:'Hi Korea → 뉴스·공지 → 민원서식에서 “거주/숙소제공 확인서”를 검색해 양식을 받은 뒤, 숙소 제공자에게 작성과 서명을 받으세요.',condition:condition('residence-type','other-person','lodging')}),
   d('id_copy','provider-id',{name:'숙소 제공자의 신분증 사본',required:true,applicableWhen:'다른 사람 명의의 집에 거주하는 경우',issuer:'숙소 제공자',condition:condition('residence-type','other-person')}),
   d('lease_contract','provider-lease',{name:'숙소 제공자 명의 임대차계약서 사본',applicableWhen:'다른 사람 명의의 임차주택에 거주하는 경우',condition:condition('residence-type','other-person')}),
   x('lodging-registration','숙박업체 사업자등록증 사본','고시원·게스트하우스 등 숙박업체의 사업자 정보를 확인하는 사본입니다.',HIKOREA,{documentType:'institution_issued',issuer:'숙박업체',actionLabel:'발급처 확인',alternativeMethod:'운영자 또는 관리실에 사본을 요청하세요.',preparationGuide:'업체명과 실제 거주 주소가 확인되는지 살펴보세요.',condition:condition('residence-type','lodging')}),
@@ -29,11 +31,11 @@ export const priorityProcedureGuides:Record<string,Partial<Procedure>>={
       {id:'residence-type',question:'현재 어디에 거주하고 있나요?',helpText:'선택한 거주 형태에 맞는 체류지 입증서류만 표시됩니다.',required:true,condition:condition('visa-type','d2'),options:[{value:'own-rental',label:'본인 명의 자취방'},{value:'dorm',label:'학교 기숙사'},{value:'other-person',label:'다른 사람 명의의 집'},{value:'lodging',label:'고시원·게스트하우스 등'}]}
     ],
     requiredDocuments:[
-      x('integrated-application','통합신청서(신고서)','출입국관리법 시행규칙 별지 제34호 공식 서식입니다.',HIKOREA,{documentType:'official_template',issuer:'법무부',actionLabel:'양식 찾기',actionUrl:HIKOREA,alternativeMethod:'Hi Korea → 뉴스·공지 → 민원서식에서 “통합신청서”를 검색해 최신 첨부파일을 받으세요.',preparationGuide:'신청인 정보와 신청 종류를 작성하고 서명하세요.',condition:condition('visa-type','d2')}),
-      d('passport_copy','passport',{preparationGuide:'여권 원본의 사진·인적사항 면을 직접 스캔하거나 복사하세요. 정보와 사진이 선명해야 합니다.',condition:condition('visa-type','d2')}),
-      d('alien_card_copy','alien-card',{name:'외국인등록증',preparationGuide:'온라인 신청은 앞·뒷면을 스캔하고, 방문 신청은 원본을 지참하세요.',condition:condition('visa-type','d2')}),
-      d('enrollment_certificate','enrollment',{actionLabel:'학교 발급처 확인',condition:condition('visa-type','d2')}),
-      d('transcript','grade',{description:'전체 이수학기의 성적이 포함된 공식 성적증명서입니다.',actionLabel:'학교 발급처 확인',condition:condition('visa-type','d2')}),
+      x('integrated-application','통합신청서(신고서)','출입국관리법 시행규칙 별지 제34호 공식 서식입니다.',HIKOREA,{documentType:'official_template',issuer:'법무부',actionLabel:'통합신청서 찾기',actionUrl:HIKOREA_FORMS,alternativeMethod:'',preparationGuide:'Hi Korea → 뉴스·공지 → 민원서식에서 “통합신청서”를 검색해 최신 양식을 다운로드하고, 작성 후 서명하세요.',condition:condition('visa-type','d2')}),
+      d('passport_copy','passport',{preparationGuide:'여권의 사진과 인적사항이 있는 면을 컬러로 복사하거나 스캔하세요.',condition:condition('visa-type','d2')}),
+      d('alien_card_copy','alien-card',{name:'외국인등록증 사본',preparationGuide:'외국인등록증 앞·뒷면을 컬러로 복사하거나 스캔하세요. 방문 신청은 원본도 지참하세요.',condition:condition('visa-type','d2')}),
+      d('enrollment_certificate','enrollment',{issuer:'소속 대학 (SKKU는 성균관대 증명발급)',actionLabel:'재학증명서 발급하기',actionUrl:'https://mcert.skku.edu/',preparationGuide:'학교 포털 또는 증명서 발급 시스템에서 재학증명서를 발급하세요. SKKU 사용자는 성균관대 증명발급에서 신청할 수 있습니다.',condition:condition('visa-type','d2')}),
+      d('transcript','grade',{description:'전체 이수학기의 성적이 포함된 공식 성적증명서입니다.',issuer:'소속 대학 (SKKU는 성균관대 증명발급)',actionLabel:'성적증명서 발급하기',actionUrl:'https://mcert.skku.edu/',preparationGuide:'전체 이수학기가 포함된 성적증명서를 학교 포털에서 발급하세요. SKKU 사용자는 성균관대 증명발급에서 신청할 수 있습니다.',condition:condition('visa-type','d2')}),
       ...d2ResidenceDocuments.map(document=>({...document,condition:document.condition})),
       x('d2-additional','체류자격별 추가서류','성적 미달, 초과학기, 수료 등의 경우 재정입증서류나 사유서가 추가될 수 있습니다.',HIKOREA,{required:false,applicableWhen:'성적 미달·초과학기·수료 등 개별 심사가 필요한 경우',documentType:'user_prepared',issuer:'신청인·학교·금융기관',condition:condition('visa-type','d2')}),
       x('visa-specific-lookup','체류자격별 서류 확인','D-4와 기타 체류자격은 허가요건과 구비서류가 달라 Hi Korea 최신 안내를 확인해야 합니다.',HIKOREA,{required:true,applicableWhen:'D-2 이외 체류자격',documentType:'online_form',issuer:'Hi Korea',actionLabel:'Hi Korea에서 확인',actionUrl:HIKOREA,condition:condition('visa-type','d4','other')})
@@ -42,7 +44,7 @@ export const priorityProcedureGuides:Record<string,Partial<Procedure>>={
       ...s(HIKOREA,[['expiry','본인의 체류기간 만료일 확인','외국인등록증과 Hi Korea에서 만료일을 확인합니다.','온라인',undefined,condition('visa-type','d2')],['status','체류자격과 학적상태에 맞는 서류 확인','D-2 재학·수료·초과학기 등 현재 학적에 맞는 추가서류를 확인합니다.',undefined,undefined,condition('visa-type','d2')],['prepare','필요한 서류 발급·작성','통합신청서, 학교증명서와 선택한 거주형태의 증빙을 준비합니다.',undefined,undefined,condition('visa-type','d2')],['login','Hi Korea 로그인','전자민원 이용을 위해 로그인하고 본인인증을 진행합니다.','온라인',undefined,condition('visa-type','d2')],['select','체류기간연장허가 민원 선택','민원신청 → 전자민원 → 등록외국인의 체류기간연장허가를 선택합니다.','온라인',undefined,condition('visa-type','d2')],['attach','신청정보 입력 및 서류 첨부','신청내용을 입력하고 준비한 파일을 항목별로 첨부합니다.','온라인',undefined,condition('visa-type','d2')],['fee','수수료 결제','전자민원 화면에 표시된 본인 체류자격의 수수료를 결제합니다.','온라인','일반적인 연장 수수료 안내는 60,000원이지만 체류자격·신청방식별 최신 금액을 확인하세요.',condition('visa-type','d2')],['result','처리결과 확인','신청내역에서 보완요청과 허가 결과, 변경된 체류기간을 확인합니다.','온라인',undefined,condition('visa-type','d2')]]),
       ...s(HIKOREA,[['lookup','체류자격별 서류와 절차 확인','Hi Korea 체류민원 안내 또는 관할 출입국·외국인관서에서 현재 자격의 절차를 확인합니다.','온라인·방문',undefined,condition('visa-type','d4','other')]])
     ],
-    fee:'일반 연장허가 60,000원 안내가 있으나 체류자격·전자민원 여부별 최종 금액 확인',processingTime:'관할기관과 심사·보완 여부에 따라 상이',officialApplicationUrl:HIKOREA,officialSourceUrls:[HIKOREA,'https://ds.pusan.ac.kr/bbs/ds/806/1428008/download.do'],lastVerifiedAt:'2026-08-18'
+    fee:'온라인 48,000원 / 방문 60,000원',processingTime:'온라인 일반적으로 14일 이내',officialApplicationUrl:HIKOREA_APPLY,officialSourceUrls:[HIKOREA,'https://www.moj.go.kr/bbs/immigration/47/446181/download.do','https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?category=%EC%99%B8%EA%B5%AD%EC%9D%B8%EC%9C%A0%ED%95%99%EC%83%9D&f=&keyword=&slug=%EC%B2%B4%EB%A5%98%EA%B4%80%EB%A6%AC2026-1%ED%95%99%EA%B8%B0-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EC%99%B8%EA%B5%AD%EC%9D%B8%EB%93%B1%EB%A1%9D-%EB%B0%8F-%EC%B2%B4%EB%A5%98'],lastVerifiedAt:'2026-08-18'
   },
   'move-in-report':{
     conditionQuestions:[
@@ -57,7 +59,7 @@ export const priorityProcedureGuides:Record<string,Partial<Procedure>>={
       d('id_copy','visit-member-id',{name:'전입하는 사람의 신분증',required:false,applicableWhen:'방문 신고에서 가족관계 등에 따라 추가 확인이 필요한 경우',condition:condition('applicant-type','resident')}),
       d('application','visit-form',{name:'전입신고서',applicableWhen:'주민센터 방문 신고 시',issuer:'주민센터',obtainMethod:'방문 창구에서 받아 작성할 수 있습니다.',preparationGuide:'온라인 신청은 정부24 화면에서 직접 입력하며 종이 신청서를 준비하지 않습니다.',condition:condition('applicant-type','resident')}),
       d('alien_card_copy','foreign-id',{name:'외국인등록증 또는 여권',condition:condition('applicant-type','foreigner')}),
-      x('foreign-integrated-form','통합신청서','출입국 체류지변경을 방문 신고할 때 사용하는 통합신청서입니다.',HIKOREA,{required:false,applicableWhen:'관할 출입국·외국인관서 방문 신고 시',documentType:'official_template',issuer:'법무부',actionLabel:'양식 찾기',actionUrl:HIKOREA,condition:condition('applicant-type','foreigner')}),
+      x('foreign-integrated-form','통합신청서','출입국 체류지변경을 방문 신고할 때 사용하는 통합신청서입니다.',HIKOREA,{required:false,applicableWhen:'관할 출입국·외국인관서 방문 신고 시',documentType:'official_template',issuer:'법무부',actionLabel:'통합신청서 찾기',actionUrl:HIKOREA_FORMS,preparationGuide:'Hi Korea → 뉴스·공지 → 민원서식에서 “통합신청서”를 검색해 최신 양식을 다운로드하고, 작성 후 서명하세요.',condition:condition('applicant-type','foreigner')}),
       ...d2ResidenceDocuments.map(document=>({...document,id:`move-${document.id}`,condition:condition('residence-type',...(document.condition?.values||[]))}))
     ],
     steps:[
