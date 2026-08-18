@@ -4,6 +4,7 @@ import {useAuth} from '../hooks/useAuth';
 import {useUserData} from '../hooks/useUserData';
 import type {Checks} from '../lib/storage';
 import {procedureProgress} from '../lib/progress';
+import {track} from '../lib/analytics';
 
 export function InProgressCard(){
   const {email}=useAuth();const [checks]=useUserData<Checks>('checks',{});const [stepChecks]=useUserData<Checks>('stepChecks',{});const [updated]=useUserData<Record<string,number>>('checkUpdated',{});const [answers]=useUserData<Record<string,Record<string,string>>>('conditionAnswers',{});
@@ -11,5 +12,5 @@ export function InProgressCard(){
   const active=procedures.map(procedure=>procedureProgress(procedure,checks,stepChecks,answers[procedure.id]||{},updated[procedure.id]||0)).filter(item=>item.completedCount>0&&!item.complete).sort((a,b)=>b.updatedAt-a.updatedAt);const progress=active[0];
   if(!progress)return <aside className="progress-preview"><p className="progress-kicker">나의 행정 준비 현황</p><h2>내 진행 중인 업무</h2><p className="progress-empty">아직 준비 중인 업무가 없어요.</p><Link className="progress-action" to="/#popular">많이 찾는 업무 보기</Link></aside>;
   const {procedure}=progress;
-  return <aside className="progress-preview"><p className="progress-kicker">진행 중</p><h2>내 진행 중인 업무</h2><span className="progress-category">{procedure.category}</span><h3>{procedure.title}</h3><div className="progress-count"><span>{progress.completedCount} / {progress.totalCount} 준비 완료</span><strong>{progress.percent}%</strong></div><div className="progress-preview-track" role="progressbar" aria-label={`${procedure.title} 준비 진행률`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}><span style={{width:`${progress.percent}%`}}/></div><p className="progress-next"><span>다음 준비</span><strong>{progress.nextLabel}</strong></p><Link className="progress-action" to={`/procedure/${procedure.id}`}>이어서 준비하기</Link></aside>;
+  return <aside className="progress-preview"><p className="progress-kicker">진행 중</p><h2>내 진행 중인 업무</h2><span className="progress-category">{procedure.category}</span><h3>{procedure.title}</h3><div className="progress-count"><span>{progress.completedCount} / {progress.totalCount} 준비 완료</span><strong>{progress.percent}%</strong></div><div className="progress-preview-track" role="progressbar" aria-label={`${procedure.title} 준비 진행률`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}><span style={{width:`${progress.percent}%`}}/></div><p className="progress-next"><span>다음 준비</span><strong>{progress.nextLabel}</strong></p><Link className="progress-action" to={`/procedure/${procedure.id}`} onClick={()=>track('resume_service',{service_id:procedure.id,progress_percent:progress.percent})}>이어서 준비하기</Link></aside>;
 }
