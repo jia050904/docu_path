@@ -26,15 +26,13 @@ npm run dev
 
 ## Google Analytics 4
 
-1. Google Analytics에서 속성을 만들고 **관리 → 데이터 스트림 → 웹**에서 Web Data Stream을 생성합니다.
-2. `G-`로 시작하는 Measurement ID를 복사합니다.
-3. `.env.example`을 복사해 `.env`를 만들고 아래처럼 입력합니다.
+Google Analytics는 `G-TGSDGEZE45` 측정 ID로 기본 설정되어 있으며, `src/lib/analytics.ts`에서 Google 공식 gtag 스크립트를 로드합니다.
 
-```env
-VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
+1. Google Analytics에서 속성을 만들고 **관리 → 데이터 스트림 → 웹**에서 `https://docupath.netlify.app/` 스트림을 확인합니다.
+2. 웹 스트림의 Measurement ID가 `G-TGSDGEZE45`인지 확인합니다.
+3. 다른 GA4 속성으로 변경할 때는 `src/lib/analytics.ts`의 `GA_MEASUREMENT_ID`를 수정하고 다시 빌드합니다.
 
-환경변수가 없으면 GA 스크립트를 로드하지 않으며 앱은 정상 작동합니다. 설정 후 개발 서버를 다시 시작하거나 사이트를 다시 빌드해야 합니다. 페이지 전환의 `page_view`와 로그인, 로그아웃, 검색, 결과 클릭, 업무 조회, 공식 링크 클릭, 문서 체크, 관심 업무 이벤트를 전송합니다. 검색 원문이나 이메일·비밀번호 등 개인정보는 전송하지 않습니다. 배포 후 GA의 **보고서 → 실시간**에서 확인하고, DebugView는 브라우저용 Google Analytics Debugger 등을 켠 뒤 **관리 → DebugView**에서 확인할 수 있습니다.
+페이지 전환의 `page_view`와 `search`, `view_service`, `service_complete`를 비롯한 기존 기능 이벤트를 전송합니다. 검색 원문이나 이메일·비밀번호 등 개인정보는 전송하지 않습니다. 배포 후 GA의 **보고서 → 실시간**에서 확인하고, DebugView는 브라우저용 Google Analytics Debugger 등을 켠 뒤 **관리 → DebugView**에서 확인할 수 있습니다.
 
 ## 배포
 

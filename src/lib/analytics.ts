@@ -1,5 +1,32 @@
 declare global{interface Window{dataLayer:unknown[];gtag:(...args:unknown[])=>void}}
-const id=import.meta.env.VITE_GA_MEASUREMENT_ID as string|undefined;
-export function initAnalytics(){if(!id)return;window.dataLayer=window.dataLayer||[];window.gtag=function(...args:unknown[]){window.dataLayer.push(args)};window.gtag('js',new Date());window.gtag('config',id,{send_page_view:false});const s=document.createElement('script');s.async=true;s.src=`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;document.head.appendChild(s)}
-export function pageView(path:string){if(id&&window.gtag)window.gtag('event','page_view',{page_path:path})}
-export function track(name:string,params:Record<string,string|number|boolean>={}){if(id&&window.gtag)window.gtag('event',name,params)}
+
+export const GA_MEASUREMENT_ID='G-TGSDGEZE45';
+let initialized=false;
+let lastPagePath='';
+
+export function initAnalytics(){
+  if(initialized||typeof window==='undefined')return;
+  initialized=true;
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(...args:unknown[]){window.dataLayer.push(args)};
+  window.gtag('js',new Date());
+  window.gtag('config',GA_MEASUREMENT_ID,{send_page_view:false});
+  const script=document.createElement('script');
+  script.async=true;
+  script.src=`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(script);
+}
+
+export function pageView(path:string){
+  if(!window.gtag||path===lastPagePath)return;
+  lastPagePath=path;
+  window.gtag('event','page_view',{
+    page_path:path,
+    page_location:`${window.location.origin}${path}`,
+    page_title:document.title,
+  });
+}
+
+export function track(name:string,params:Record<string,string|number|boolean>={}){
+  if(window.gtag)window.gtag('event',name,params);
+}

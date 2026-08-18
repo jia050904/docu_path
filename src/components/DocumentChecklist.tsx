@@ -1,4 +1,5 @@
 import {ExternalLink,ChevronDown} from 'lucide-react';
+import {useEffect,useRef} from 'react';
 import type {Procedure,RequiredDocument} from '../types/procedure';
 import {ProgressBar} from './ProgressBar';
 import {useAuth} from '../hooks/useAuth';
@@ -18,6 +19,12 @@ export function DocumentChecklist({procedure,answers}:{procedure:Procedure;answe
   const selected=checks[procedure.id]||[];
   const documents=procedure.requiredDocuments.filter(document=>!document.condition||document.condition.values.includes(answers[document.condition.questionId]));
   const progress=procedureProgress(procedure,checks,stepChecks,answers);
+  const completionState=useRef({procedureId:procedure.id,complete:progress.complete});
+  useEffect(()=>{
+    const previous=completionState.current;
+    if(previous.procedureId===procedure.id&&progress.complete&&!previous.complete)track('service_complete',{procedure_id:procedure.id,category:procedure.category,total_items:progress.totalCount});
+    completionState.current={procedureId:procedure.id,complete:progress.complete};
+  },[procedure.category,procedure.id,progress.complete,progress.totalCount]);
   const toggle=(id:string)=>{if(!email){alert('체크리스트 저장은 Demo 로그인 후 이용할 수 있어요.');return}const checked=!selected.includes(id);setChecks(old=>({...old,[procedure.id]:checked?[...(old[procedure.id]||[]),id]:(old[procedure.id]||[]).filter(item=>item!==id)}));setUpdated(old=>({...old,[procedure.id]:Date.now()}));track('document_check',{procedure_id:procedure.id,document_id:id,checked})};
   return <section className="detail-section">
     <div className="section-heading"><div><p className="eyebrow">준비물 체크리스트</p><h2>필요한 서류</h2></div></div>
