@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">서류길 로고</title>
+  <rect width="64" height="64" rx="15" fill="#2F6232"/>
+  <path d="M20 13.5h17l9 9V42c0 3-2.5 5.5-5.5 5.5h-20A5.5 5.5 0 0 1 15 42V19a5.5 5.5 0 0 1 5-5.5Z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M37 14v9h9" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M23 31h11M23 37h8" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M20 49c6-6 11-7 16-4s8 3 13-2" fill="none" stroke="#E4BC45" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="50" cy="42" r="3" fill="#E4BC45"/>
+</svg>
