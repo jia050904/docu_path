@@ -2,7 +2,7 @@ export type Category = '장학금'|'학자금'|'알바'|'자취'|'월세'|'이�
 export type VerificationStatus = 'verified'|'institution-specific'|'pending';
 export type ApplicationMethod = '온라인'|'방문'|'온라인·방문'|'기관별 확인 필요';
 export type ConditionOption = { value:string; label:string };
-export type ConditionQuestion = { id:string; question:string; helpText?:string; options:ConditionOption[]; required:boolean };
+export type ConditionQuestion = { id:string; question:string; helpText?:string; options:ConditionOption[]; required:boolean; condition?:{questionId:string;values:string[]} };
 export type DocumentType = 'online_issue'|'official_template'|'online_form'|'user_prepared'|'institution_issued'|'existing_document';
 export type RequiredDocument = {
   id:string;

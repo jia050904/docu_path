@@ -1,6 +1,7 @@
 import type {Category,Procedure} from '../types/procedure';
 import {completeDocument} from './documentCatalog';
 import {highFrequencyGuides} from './highFrequencyGuides';
+import {priorityProcedureGuides} from './priorityProcedureGuides';
 
 const VERIFIED_AT='2026-08-18';
 const DISCLAIMER='실제 신청 전 담당 기관의 최신 공고와 공식 안내를 반드시 확인해 주세요.';
@@ -107,6 +108,6 @@ const guideAlias:Record<string,string>={
 export const procedures:Procedure[]=[...verified,...seeds.map(pending)].map(draft=>{
   const base={...draft,requiredDocuments:draft.requiredDocuments.map(completeDocument)} as Procedure;
   const guide=highFrequencyGuides[base.id]||highFrequencyGuides[guideAlias[base.id]];
-  return {...base,...guide};
+  return {...base,...guide,...priorityProcedureGuides[base.id]};
 });
 export const categories:Extract<Category,'자취'|'알바'|'장학금'|'증명서'>[]=['자취','알바','장학금','증명서'];

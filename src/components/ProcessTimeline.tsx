@@ -1,2 +1,14 @@
-import type {Procedure} from '../types/procedure';import {useAuth} from '../hooks/useAuth';import {useUserData} from '../hooks/useUserData';import type {Checks} from '../lib/storage';
-export function ProcessTimeline({procedure,answers}:{procedure:Procedure;answers:Record<string,string>}){const {email}=useAuth();const [checks,setChecks]=useUserData<Checks>('stepChecks',{});const [,setUpdated]=useUserData<Record<string,number>>('checkUpdated',{});const selected=checks[procedure.id]||[];const steps=procedure.steps.filter(s=>!s.condition||s.condition.values.includes(answers[s.condition.questionId])).sort((a,b)=>a.order-b.order);const toggle=(id:string)=>{if(!email){alert('처리 순서 저장은 Demo 로그인 후 이용할 수 있어요.');return}setChecks(old=>({...old,[procedure.id]:selected.includes(id)?selected.filter(x=>x!==id):[...selected,id]}));setUpdated(old=>({...old,[procedure.id]:Date.now()}))};return <section className="detail-section"><p className="eyebrow">순서대로 완료하기</p><h2>처리 순서</h2>{steps.length?<ol className="timeline">{steps.map(s=><li key={s.id}><label className="step-check"><input type="checkbox" checked={selected.includes(s.id)} onChange={()=>toggle(s.id)}/><span className="step-number">{s.order}</span></label><div><h3>{s.title}</h3><p>{s.description}</p>{s.method&&<span className="method">방법 · {s.method}</span>}{s.caution&&<small>주의 · {s.caution}</small>}</div></li>)}</ol>:<p className="pending-link">공통 처리 순서를 추가 확인 중입니다. 공식 신청처에서 본인 조건에 맞는 절차를 확인해 주세요.</p>}</section>}
+import type {Procedure} from '../types/procedure';
+import {useAuth} from '../hooks/useAuth';
+import {useUserData} from '../hooks/useUserData';
+import type {Checks} from '../lib/storage';
+
+export function ProcessTimeline({procedure,answers}:{procedure:Procedure;answers:Record<string,string>}){
+  const {email}=useAuth();
+  const [checks,setChecks]=useUserData<Checks>('stepChecks',{});
+  const [,setUpdated]=useUserData<Record<string,number>>('checkUpdated',{});
+  const selected=checks[procedure.id]||[];
+  const steps=procedure.steps.filter(step=>!step.condition||step.condition.values.includes(answers[step.condition.questionId])).sort((a,b)=>a.order-b.order);
+  const toggle=(id:string)=>{if(!email){alert('처리 순서 저장은 Demo 로그인 후 이용할 수 있어요.');return}setChecks(old=>({...old,[procedure.id]:selected.includes(id)?selected.filter(item=>item!==id):[...selected,id]}));setUpdated(old=>({...old,[procedure.id]:Date.now()}))};
+  return <section className="detail-section"><p className="eyebrow">순서대로 완료하기</p><h2>처리 순서</h2>{steps.length?<ol className="timeline">{steps.map(step=><li className={selected.includes(step.id)?'step-completed':''} key={step.id}><label className="timeline-row"><input type="checkbox" checked={selected.includes(step.id)} onChange={()=>toggle(step.id)}/><span className="step-checkbox" aria-hidden="true">✓</span><span className="step-number">{step.order}</span><span className="step-content"><strong>{step.title}</strong><span>{step.description}</span>{step.method&&<em>방법 · {step.method}</em>}{step.caution&&<small>주의 · {step.caution}</small>}</span></label></li>)}</ol>:<p className="pending-link">조건을 선택하면 본인 상황에 맞는 처리 순서가 표시됩니다.</p>}</section>;
+}
