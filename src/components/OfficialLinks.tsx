@@ -1,3 +1,16 @@
-import {ExternalLink} from 'lucide-react';import type {Procedure} from '../types/procedure';import {track} from '../lib/analytics';
-function LinkButton({url,label,procedureId}:{url?:string;label:string;procedureId:string}){return url?<a className="outline-button" href={url} target="_blank" rel="noopener noreferrer" onClick={()=>track('official_link_click',{procedure_id:procedureId,link_type:label})}>{label}<ExternalLink size={16}/></a>:null}
-export function OfficialLinks({procedure:p}:{procedure:Procedure}){return <section className="detail-section official"><p className="eyebrow">공식 기관에서 다시 확인하세요</p><h2>신청처 안내</h2><dl><div><dt>담당 기관</dt><dd>{p.responsibleAgency}</dd></div><div><dt>신청 방법</dt><dd>{p.applicationMethod}</dd></div><div><dt>수수료</dt><dd>{p.fee}</dd></div><div><dt>처리기간</dt><dd>{p.processingTime}</dd></div></dl><div className="link-grid"><LinkButton url={p.officialApplicationUrl} label="공식 신청·조회 페이지" procedureId={p.id}/>{p.officialSourceUrls.map((url,i)=><LinkButton key={url} url={url} label={`공식 자료 ${i+1}`} procedureId={p.id}/>)}</div></section>}
+import {ExternalLink} from 'lucide-react';
+import type {Procedure} from '../types/procedure';
+import {track} from '../lib/analytics';
+
+const sourceName=(url:string)=>{const host=new URL(url).hostname;if(host.includes('hikorea'))return 'Hi Korea 이용안내';if(host.includes('gov.kr'))return '정부24 안내';if(host.includes('moj.go.kr'))return '법무부 안내';if(host.includes('kosaf'))return '한국장학재단 안내';if(host.includes('rtms'))return '국토교통부 임대차신고 안내';if(host.includes('e-health'))return 'e보건소 이용안내';if(host.endsWith('.ac.kr'))return '대학 공식 안내';return '담당 기관 안내'};
+const applicationLabel=(procedure:Procedure)=>procedure.id==='stay-extension'?'Hi Korea에서 온라인 신청':procedure.id==='move-in-report'?'정부24에서 전입신고':procedure.id==='fixed-date'?'부동산거래관리시스템에서 신청':procedure.id==='national-scholarship'?'한국장학재단에서 신청':procedure.id==='health-certificate'?'e보건소에서 결과서 발급':'온라인 신청·조회';
+
+export function OfficialLinks({procedure}:{procedure:Procedure}){
+  const stay=procedure.id==='stay-extension';
+  const sources=[...new Set(procedure.officialSourceUrls)].filter(url=>url!==procedure.officialApplicationUrl);
+  return <section className="detail-section official"><p className="eyebrow">바로 신청하기</p><h2>신청 정보</h2><dl>
+    <div><dt>신청 기관</dt><dd>{stay?'Hi Korea / 관할 출입국·외국인관서':procedure.responsibleAgency}</dd></div>
+    <div><dt>신청 방법</dt><dd>{stay?'온라인 / 방문':procedure.applicationMethod}</dd></div>
+    {stay?<><div><dt>수수료</dt><dd><span>온라인 48,000원</span><span>방문 60,000원</span></dd></div><div><dt>처리기간</dt><dd>온라인 14일 이내</dd></div></>:<>{procedure.fee&&!procedure.fee.includes('확인')&&!procedure.fee.includes('상이')&&<div><dt>수수료</dt><dd>{procedure.fee}</dd></div>}{procedure.processingTime&&!procedure.processingTime.includes('확인')&&!procedure.processingTime.includes('상이')&&<div><dt>처리기간</dt><dd>{procedure.processingTime}</dd></div>}</>}
+  </dl>{procedure.officialApplicationUrl&&<a className="primary-link-button" href={procedure.officialApplicationUrl} target="_blank" rel="noopener noreferrer" onClick={()=>track('official_link_click',{procedure_id:procedure.id,link_type:'application'})}>{applicationLabel(procedure)} <ExternalLink size={16}/></a>}{stay&&<p className="application-path">Hi Korea → 민원신청 → 전자민원 → 등록외국인의 체류기간연장허가</p>}{sources.length>0&&<div className="named-source-links">{sources.map(url=><a key={url} href={url} target="_blank" rel="noopener noreferrer">{sourceName(url)} <ExternalLink size={13}/></a>)}</div>}</section>;
+}
