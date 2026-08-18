@@ -1,0 +1,1 @@
+export function Footer(){return <footer className="site-footer"><div className="shell"><strong>서류길</strong><p>본 서비스는 행정절차 이해를 돕기 위한 안내 서비스입니다. 실제 신청 전 담당 기관의 최신 공고와 공식 안내를 반드시 확인해 주세요.</p><p>주민등록번호, 외국인등록번호, 주소 등 민감정보를 입력하거나 저장하지 마세요.</p></div></footer>}

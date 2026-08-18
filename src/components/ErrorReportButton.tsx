@@ -1,0 +1,1 @@
+export function ErrorReportButton({procedureId}:{procedureId:string}){return <a className="outline-button" href={`https://github.com/jia050904/docu_path/issues/new?title=${encodeURIComponent(`[정보 오류] ${procedureId}`)}`} target="_blank" rel="noopener noreferrer">정보 오류 신고</a>}
