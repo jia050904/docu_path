@@ -45,4 +45,7 @@ export type Procedure = {
   lastVerifiedAt:string;
   notice:string;
   verificationStatus:VerificationStatus;
+  personaTags?:string[];
+  applicableYear?:string;
+  sourceNames?:string[];
 };

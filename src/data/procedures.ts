@@ -2,6 +2,7 @@ import type {Category,Procedure} from '../types/procedure';
 import {completeDocument} from './documentCatalog';
 import {highFrequencyGuides} from './highFrequencyGuides';
 import {priorityProcedureGuides} from './priorityProcedureGuides';
+import {personaProcedureGuides} from './personaProcedureGuides';
 
 const VERIFIED_AT='2026-08-18';
 const DISCLAIMER='실제 신청 전 담당 기관의 최신 공고와 공식 안내를 반드시 확인해 주세요.';
@@ -51,6 +52,7 @@ const seeds:Seed[]=[
  ['youth-rent-support','월세','청년월세지원',['청년 월세'],['월세'], '국토교통부·지방자치단체','https://www.bokjiro.go.kr/','국가 사업과 지자체 사업을 구분해 해당 공고를 확인해야 합니다.',regionQuestions],
  ['rent-tax-credit','월세','월세 세액공제',['월세 환급'],['월세','세금'], '국세청 홈택스','https://www.hometax.go.kr/'],
  ['rental-contract-report','월세','임대차계약 신고',['전월세 신고'],['월세','이사'], '국토교통부','https://rtms.molit.go.kr/'],
+ ['mail-forwarding','이사','주거이전 우편물 전송서비스',['우편물 이전'],['이사','주소 변경'], '우정사업본부','https://service.epost.go.kr/comm.RetrievePostagSrvcStrt.postal?menu=NEWA&file=1'],
  ['rent-proof','월세','월세 증빙 준비',['월세 영수증'],['월세','세금'], '국세청','https://www.nts.go.kr/','공제·신고 목적과 지급 방식에 따라 인정 자료가 달라 공식 세무 안내 확인이 필요합니다.'],
  ['address-change','이사','주소 변경',['주소 이전'],['이사'], '정부24·개별 서비스 제공기관','https://www.gov.kr/','주민등록 전입 외 금융·통신·배송 주소는 각 기관에서 별도 변경해야 합니다.'],
  ['utility-name-change','이사','공과금 명의 변경',['전기 명의 변경','가스 명의 변경'],['이사'], '한국전력·지역 도시가스·수도사업소','https://online.kepco.co.kr/','전기·가스·수도 공급기관과 지역에 따라 절차가 다릅니다.'],
@@ -108,6 +110,6 @@ const guideAlias:Record<string,string>={
 export const procedures:Procedure[]=[...verified,...seeds.map(pending)].map(draft=>{
   const base={...draft,requiredDocuments:draft.requiredDocuments.map(completeDocument)} as Procedure;
   const guide=highFrequencyGuides[base.id]||highFrequencyGuides[guideAlias[base.id]];
-  return {...base,...guide,...priorityProcedureGuides[base.id]};
+  return {...base,...guide,...priorityProcedureGuides[base.id],...personaProcedureGuides[base.id]};
 });
 export const categories:Extract<Category,'자취'|'알바'|'장학금'|'증명서'>[]=['자취','알바','장학금','증명서'];
