@@ -1,0 +1,2 @@
+export type Category = '자취' | '알바' | '장학금' | '증명서';
+export type Procedure = { id:string; title:string; description:string; category:Category; keywords:string[]; aliases:string[]; documents:{id:string;name:string;description:string;issueUrl?:string}[]; steps:{order:number;title:string;description:string;method?:string;caution?:string}[]; agency:string; onlineAvailable:boolean; officialUrl?:string; applicationUrl?:string; locationName?:string; mapUrl?:string; sourceName:string; verifiedAt:string; cautions:string[] };

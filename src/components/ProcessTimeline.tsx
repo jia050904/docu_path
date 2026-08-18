@@ -1,0 +1,2 @@
+import type {Procedure} from '../types/procedure';
+export function ProcessTimeline({steps}:{steps:Procedure['steps']}){return <section className="detail-section"><p className="eyebrow">신청 흐름을 미리 살펴봐요</p><h2>처리 순서</h2><ol className="timeline">{steps.sort((a,b)=>a.order-b.order).map(s=><li key={s.order}><span className="step-number">{s.order}</span><div><h3>{s.title}</h3><p>{s.description}</p>{s.method&&<span className="method">방법 · {s.method}</span>}{s.caution&&<small>주의 · {s.caution}</small>}</div></li>)}</ol></section>}

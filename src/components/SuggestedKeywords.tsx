@@ -1,0 +1,2 @@
+import {useNavigate} from 'react-router-dom';import {useUserData} from '../hooks/useUserData';
+export function SuggestedKeywords(){const nav=useNavigate();const [,setRecent]=useUserData<string[]>('recent',[]);return <div className="keyword-row" aria-label="추천 검색어">{['자취','알바','장학금','증명서'].map(x=><button key={x} onClick={()=>{setRecent(o=>[x,...o.filter(v=>v!==x)].slice(0,5));nav(`/search?q=${encodeURIComponent(x)}`)}}>{x}</button>)}</div>}

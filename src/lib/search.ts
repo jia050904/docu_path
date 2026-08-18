@@ -1,0 +1,4 @@
+import { procedures } from '../data/procedures'; import type { Procedure } from '../types/procedure';
+const clean=(v:string)=>v.toLowerCase().replace(/\s+/g,'').trim();
+export function searchProcedures(query:string):Procedure[]{const q=clean(query);if(!q)return procedures;return procedures.map(p=>{const fields=[p.category,p.title,...p.keywords,...p.aliases];const score=fields.reduce((n,f)=>{const x=clean(f);return n+(x===q?10:x.includes(q)||q.includes(x)?4:0)},0);return {p,score}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.p)}
+export function suggestions(query:string){if(!query.trim())return []; const pool=[...new Set(procedures.flatMap(p=>[p.title,p.category,...p.keywords,...p.aliases]))]; const q=clean(query); return pool.filter(x=>clean(x).includes(q)||q.includes(clean(x))).slice(0,6)}
